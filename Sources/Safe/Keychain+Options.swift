@@ -10,11 +10,11 @@ import os.log
 import Security
 
 extension Keychain {
-    struct Options {
+    struct Configuration {
         var itemClass: ItemClass = .genericPassword
 
         var service: String = ""
-        var accessGroup: String? = nil
+        var accessGroup: SharedGroupIdentifier? = nil
 
         var server: URL?
         var protocolType: String = ""
@@ -34,7 +34,7 @@ extension Keychain {
 
         var attributes = Attributes()
     }
-    
+
     @discardableResult
     static func securityError(status: OSStatus) -> Error {
         let error = KeychainError(status: status)
@@ -60,7 +60,7 @@ extension Attributes {
             setOrRemove(newValue, forKey: UseOperationPrompt)
         }
     }
-    
+
     var useAuthenticationContext: AnyObject? {
         get {
             self[UseAuthentication.Context] as? AnyObject
@@ -71,20 +71,15 @@ extension Attributes {
     }
 }
 
-extension Keychain.Options {
-    func queryAttributes(ignoringAttributeSynchronizable: Bool = true) -> Attributes {
-        var query = Attributes()
+extension Keychain.Configuration {
+    func queryAttributes(options: Attributes = .defaultOptions) -> Attributes {
+        var query = options
 
         query.class = itemClass.rawValue
         if let accessGroup = self.accessGroup {
-            query.accessGroup = accessGroup
+            query.accessGroup = accessGroup.id
         }
-        if ignoringAttributeSynchronizable {
-            query.synchronizable = SynchronizableAny
-        } else {
-            query.synchronizable = isSynchronizable ? kCFBooleanTrue : kCFBooleanFalse
-        }
-
+        
         switch itemClass {
         case .genericPassword:
             query.service = service
@@ -109,7 +104,7 @@ extension Keychain.Options {
 
         return query
     }
-    
+
     func attributes(forKey key: String?, value: Data) -> (Attributes, Error?) {
         var attributes: Attributes
 

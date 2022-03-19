@@ -11,6 +11,10 @@ import Security
 public typealias Attributes = [String: Any]
 
 public extension Attributes {
+    static var defaultOptions: Attributes {
+        [AttributeKey.Synchronizable: SynchronizableAny]
+    }
+    
     var `class`: String? {
         get {
             self[AttributeKey.AttrClass] as? String
@@ -89,7 +93,7 @@ public extension Attributes {
             setOrRemove(newValue, forKey: AttributeKey.Synchronizable)
         }
     }
-    
+
     var creationDate: Date? {
         get {
             self[AttributeKey.CreationDate] as? Date
@@ -251,7 +255,9 @@ public extension Attributes {
             setOrRemove(newValue, forKey: AttributeKey.Path)
         }
     }
-    
+}
+
+extension Attributes {
     mutating func setOrRemove(_ value: Any?, forKey key: String) {
         guard let value = value else {
             removeValue(forKey: key)

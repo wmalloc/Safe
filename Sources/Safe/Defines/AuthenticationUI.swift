@@ -27,7 +27,7 @@ extension AuthenticationUI: RawRepresentable {
             return nil
         }
     }
-    
+
     public var rawValue: String {
         switch self {
         case .allow:

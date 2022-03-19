@@ -13,59 +13,59 @@ import LocalAuthentication
 
 public extension Keychain {
     var itemClass: ItemClass {
-        options.itemClass
+        configuaration.itemClass
     }
 
     var service: String {
-        options.service
+        configuaration.service
     }
 
-    var accessGroup: String? {
-        options.accessGroup
+    var accessGroup: SharedGroupIdentifier? {
+        configuaration.accessGroup
     }
 
     var server: URL? {
-        options.server
+        configuaration.server
     }
 
     var protocolType: String {
-        options.protocolType
+        configuaration.protocolType
     }
 
     var authenticationType: String {
-        options.authenticationType
+        configuaration.authenticationType
     }
 
     var accessibility: Accessibility {
-        return options.accessibility
+        configuaration.accessibility
     }
 
     var isSynchronizable: Bool {
-        options.isSynchronizable
+        configuaration.isSynchronizable
     }
 
     var label: String? {
-        options.label
+        configuaration.label
     }
 
     var comment: String? {
-        options.comment
+        configuaration.comment
     }
 
 #if os(iOS) || os(macOS)
     var authenticationPolicy: AuthenticationPolicy? {
-        options.authenticationPolicy
+        configuaration.authenticationPolicy
     }
 
     var authenticationPrompt: String? {
-        options.authenticationPrompt
+        configuaration.authenticationPrompt
     }
     var authenticationUI: AuthenticationUI {
-        options.authenticationUI ?? .allow
+        configuaration.authenticationUI ?? .allow
     }
 
     var authenticationContext: LAContext? {
-        options.authenticationContext as? LAContext
+        configuaration.authenticationContext as? LAContext
     }
 #endif
 }

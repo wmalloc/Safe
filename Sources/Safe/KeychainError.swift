@@ -16,7 +16,7 @@ public enum KeychainError: OSStatus, LocalizedError {
     case missingEntitlement                 = -34018
     case conversionError                    = -67594
     case unexpectedError                    = -99999
-    
+
     public var errorDescription: String? {
         description
     }

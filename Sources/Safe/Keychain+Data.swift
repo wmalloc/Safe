@@ -9,8 +9,8 @@ import Foundation
 import Security
 
 public extension Keychain {
-    func data(forKey key: String, ignoringAttributeSynchronizable: Bool = true) throws -> Data? {
-        var query = options.queryAttributes(ignoringAttributeSynchronizable: ignoringAttributeSynchronizable)
+    func data(forKey key: String, options: Attributes = .defaultOptions) throws -> Data? {
+        var query = configuaration.queryAttributes(options: options)
         query[Search.MatchLimit] = Search.MatchLimitOne
         query[ReturnType.Data] = kCFBooleanTrue
         query.account = key
@@ -31,24 +31,24 @@ public extension Keychain {
         }
     }
 
-    func set(data value: Data, forKey key: String, ignoringAttributeSynchronizable: Bool = true) throws {
-        var query = options.queryAttributes(ignoringAttributeSynchronizable: ignoringAttributeSynchronizable)
+    func set(data value: Data, forKey key: String, options: Attributes = .defaultOptions) throws {
+        var query = configuaration.queryAttributes(options: options)
         query.account = key
         #if os(iOS)
-        if let authenticationUI = options.authenticationUI {
+        if let authenticationUI = configuaration.authenticationUI {
             query[UseAuthentication.UI] = authenticationUI.rawValue
         } else {
             query[UseAuthentication.UI] = UseAuthentication.UIFail
         }
         #elseif os(OSX)
         query[ReturnType.Data] = kCFBooleanTrue
-        if let authenticationUI = options.authenticationUI {
+        if let authenticationUI = configuaration.authenticationUI {
             query[UseAuthentication.UI] = authenticationUI.rawValue
         } else {
             query[UseAuthentication.UI] = UseAuthentication.UIFail
         }
         #else
-        if let authenticationUI = options.authenticationUI {
+        if let authenticationUI = configuaration.authenticationUI {
             query[UseAuthentication.UI] = authenticationUI.rawValue
         }
         #endif
@@ -56,16 +56,16 @@ public extension Keychain {
         var status = SecItemCopyMatching(query as CFDictionary, nil)
         switch status {
         case errSecSuccess, errSecInteractionNotAllowed:
-            var query = options.queryAttributes()
+            var query = configuaration.queryAttributes()
             query.account = key
 
-            var (attributes, error) = options.attributes(forKey: nil, value: value)
+            var (attributes, error) = configuaration.attributes(forKey: nil, value: value)
             if let error = error {
                 print(error.localizedDescription)
                 throw error
             }
 
-            options.attributes.forEach { attributes.updateValue($1, forKey: $0) }
+            configuaration.attributes.forEach { attributes.updateValue($1, forKey: $0) }
 
             #if os(iOS)
             if status == errSecInteractionNotAllowed && floor(NSFoundationVersionNumber) <= floor(NSFoundationVersionNumber_iOS_8_0) {
@@ -84,13 +84,13 @@ public extension Keychain {
             }
             #endif
         case errSecItemNotFound:
-            var (attributes, error) = options.attributes(forKey: key, value: value)
+            var (attributes, error) = configuaration.attributes(forKey: key, value: value)
             if let error = error {
                 print(error.localizedDescription)
                 throw error
             }
 
-            options.attributes.forEach { attributes.updateValue($1, forKey: $0) }
+            configuaration.attributes.forEach { attributes.updateValue($1, forKey: $0) }
 
             status = SecItemAdd(attributes as CFDictionary, nil)
             if status != errSecSuccess {
