@@ -18,6 +18,7 @@ extension OSLog {
 
 public final class Keychain {
     let configuaration: Configuration
+    let accessLock = NSLock()
 
     init(_ configuration: Configuration) {
         self.configuaration = configuration

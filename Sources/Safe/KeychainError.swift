@@ -13,6 +13,7 @@ public enum KeychainError: OSStatus, LocalizedError {
     case unimplemented                      = -4
     case param                              = -50
     case userCanceled                       = -128
+    case notAvailable                       = -25291
     case missingEntitlement                 = -34018
     case conversionError                    = -67594
     case unexpectedError                    = -99999
@@ -42,6 +43,8 @@ extension KeychainError: CustomStringConvertible {
             return "One or more parameters passed to a function were not valid."
         case .userCanceled:
              return "User canceled the operation."
+        case .notAvailable:
+            return "No keychain is available. You may need to restart your computer."
         case .missingEntitlement:
             return "A required entitlement isn't present."
         case .conversionError:

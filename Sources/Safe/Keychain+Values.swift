@@ -9,7 +9,16 @@ import Foundation
 import os.log
 import Security
 
-public extension Keychain {
+
+internal func execute<ReturnType>(in lock: NSLock, block: () throws -> ReturnType) rethrows -> ReturnType {
+    lock.lock()
+    defer {
+        lock.unlock()
+    }
+    return try block()
+}
+
+public extension Keychain {    
     typealias AttributesMapper<T> = (Attributes?) -> T
     typealias DataMapper<U, T> = (U) throws -> T
 
@@ -36,8 +45,11 @@ public extension Keychain {
         query.account = key
 
         var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-
+        var status: OSStatus = errSecNotAvailable
+        execute(in: accessLock) {
+            status = SecItemCopyMatching(query as CFDictionary, &result)
+        }
+ 
         switch status {
         case errSecSuccess:
             guard let attributes = result as? Attributes else {
@@ -55,7 +67,11 @@ public extension Keychain {
         var query = configuaration.queryAttributes(options: options)
         query.account = key
 
-        let status = SecItemDelete(query as CFDictionary)
+        var status: OSStatus = errSecNotAvailable
+        execute(in: accessLock, block: {
+            status = SecItemDelete(query as CFDictionary)
+        })
+        
         if status != errSecSuccess && status != errSecItemNotFound {
             throw securityError(status: status)
         }
@@ -69,6 +85,37 @@ public extension Keychain {
 
         let status = SecItemDelete(query as CFDictionary)
         if status != errSecSuccess && status != errSecItemNotFound {
+            throw securityError(status: status)
+        }
+    }
+    
+    func contains(forKey key: String, withoutAuthenticationUI: Bool = false) throws -> Bool {
+        var query = configuaration.queryAttributes()
+        query[AttributeKey.Account] = key
+
+        if withoutAuthenticationUI {
+            if let authenticationUI = configuaration.authenticationUI {
+                query[UseAuthentication.UI] = authenticationUI.rawValue
+            } else {
+                query[UseAuthentication.UI] = UseAuthentication.UIFail
+            }
+        }
+        
+        var status: OSStatus = errSecNotAvailable
+        execute(in: accessLock) {
+            status = SecItemCopyMatching(query as CFDictionary, nil)
+        }
+        switch status {
+        case errSecSuccess:
+            return true
+        case errSecInteractionNotAllowed:
+            if withoutAuthenticationUI {
+                return true
+            }
+            return false
+        case errSecItemNotFound:
+            return false
+        default:
             throw securityError(status: status)
         }
     }

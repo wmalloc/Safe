@@ -91,8 +91,10 @@ extension Keychain.Configuration {
         }
 
         if #available(OSX 10.15, *) {
-            if authenticationPrompt != nil {
-                query.authenticationPrompt = authenticationPrompt
+            if options.authenticationPrompt == nil {
+                if authenticationPrompt != nil {
+                    query.authenticationPrompt = authenticationPrompt
+                }
             }
         }
 

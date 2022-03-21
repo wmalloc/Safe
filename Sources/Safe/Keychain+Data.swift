@@ -16,8 +16,11 @@ public extension Keychain {
         query.account = key
 
         var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-
+        var status: OSStatus = errSecNotAvailable
+        execute(in: accessLock) {
+            status = SecItemCopyMatching(query as CFDictionary, &result)
+        }
+        
         switch status {
         case errSecSuccess:
             guard let data = result as? Data else {
@@ -53,7 +56,11 @@ public extension Keychain {
         }
         #endif
 
-        var status = SecItemCopyMatching(query as CFDictionary, nil)
+        var status: OSStatus = errSecNotAvailable
+        execute(in: accessLock) {
+            status = SecItemCopyMatching(query as CFDictionary, nil)
+        }
+
         switch status {
         case errSecSuccess, errSecInteractionNotAllowed:
             var query = configuaration.queryAttributes()
