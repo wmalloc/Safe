@@ -11,7 +11,7 @@ import Security
 
 public extension Keychain {
     func string(forKey key: String, options: Attributes = .defaultOptions) throws -> String? {
-        guard let data = try data(forKey: key, options: options) else  {
+        guard let data = try data(forKey: key, options: options) else {
             return nil
         }
         guard let string = String(data: data, encoding: .utf8) else {

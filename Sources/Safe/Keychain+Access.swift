@@ -60,6 +60,7 @@ public extension Keychain {
     var authenticationPrompt: String? {
         configuaration.authenticationPrompt
     }
+
     var authenticationUI: AuthenticationUI {
         configuaration.authenticationUI ?? .allow
     }

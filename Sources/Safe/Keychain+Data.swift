@@ -20,7 +20,7 @@ public extension Keychain {
         execute(in: accessLock) {
             status = SecItemCopyMatching(query as CFDictionary, &result)
         }
-        
+
         switch status {
         case errSecSuccess:
             guard let data = result as? Data else {
@@ -75,17 +75,21 @@ public extension Keychain {
             configuaration.attributes.forEach { attributes.updateValue($1, forKey: $0) }
 
             #if os(iOS)
-            if status == errSecInteractionNotAllowed && floor(NSFoundationVersionNumber) <= floor(NSFoundationVersionNumber_iOS_8_0) {
+            if status == errSecInteractionNotAllowed, floor(NSFoundationVersionNumber) <= floor(NSFoundationVersionNumber_iOS_8_0) {
                 try removeItem(forKey: key)
                 try set(data: value, forKey: key)
             } else {
-                status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+                execute(in: accessLock) {
+                    status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+                }
                 if status != errSecSuccess {
                     throw securityError(status: status)
                 }
             }
             #else
-            status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+            execute(in: accessLock) {
+                status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+            }
             if status != errSecSuccess {
                 throw securityError(status: status)
             }
@@ -99,7 +103,9 @@ public extension Keychain {
 
             configuaration.attributes.forEach { attributes.updateValue($1, forKey: $0) }
 
-            status = SecItemAdd(attributes as CFDictionary, nil)
+            execute(in: accessLock) {
+                status = SecItemAdd(attributes as CFDictionary, nil)
+            }
             if status != errSecSuccess {
                 throw securityError(status: status)
             }

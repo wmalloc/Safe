@@ -76,10 +76,10 @@ extension Keychain.Configuration {
         var query = options
 
         query.class = itemClass.rawValue
-        if let accessGroup = self.accessGroup {
+        if let accessGroup = accessGroup {
             query.accessGroup = accessGroup.id
         }
-        
+
         switch itemClass {
         case .genericPassword:
             query.service = service

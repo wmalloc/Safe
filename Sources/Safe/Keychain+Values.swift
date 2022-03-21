@@ -9,7 +9,6 @@ import Foundation
 import os.log
 import Security
 
-
 internal func execute<ReturnType>(in lock: NSLock, block: () throws -> ReturnType) rethrows -> ReturnType {
     lock.lock()
     defer {
@@ -18,7 +17,7 @@ internal func execute<ReturnType>(in lock: NSLock, block: () throws -> ReturnTyp
     return try block()
 }
 
-public extension Keychain {    
+public extension Keychain {
     typealias AttributesMapper<T> = (Attributes?) -> T
     typealias DataMapper<U, T> = (U) throws -> T
 
@@ -49,7 +48,7 @@ public extension Keychain {
         execute(in: accessLock) {
             status = SecItemCopyMatching(query as CFDictionary, &result)
         }
- 
+
         switch status {
         case errSecSuccess:
             guard let attributes = result as? Attributes else {
@@ -71,8 +70,8 @@ public extension Keychain {
         execute(in: accessLock, block: {
             status = SecItemDelete(query as CFDictionary)
         })
-        
-        if status != errSecSuccess && status != errSecItemNotFound {
+
+        if status != errSecSuccess, status != errSecItemNotFound {
             throw securityError(status: status)
         }
     }
@@ -82,13 +81,15 @@ public extension Keychain {
 #if !os(iOS) && !os(watchOS) && !os(tvOS)
         query[Search.MatchLimit] = Search.MatchLimitAll
 #endif
-
-        let status = SecItemDelete(query as CFDictionary)
-        if status != errSecSuccess && status != errSecItemNotFound {
+        var status: OSStatus = errSecNotAvailable
+        execute(in: accessLock) {
+            status = SecItemDelete(query as CFDictionary)
+        }
+        if status != errSecSuccess, status != errSecItemNotFound {
             throw securityError(status: status)
         }
     }
-    
+
     func contains(forKey key: String, withoutAuthenticationUI: Bool = false) throws -> Bool {
         var query = configuaration.queryAttributes()
         query[AttributeKey.Account] = key
@@ -100,7 +101,7 @@ public extension Keychain {
                 query[UseAuthentication.UI] = UseAuthentication.UIFail
             }
         }
-        
+
         var status: OSStatus = errSecNotAvailable
         execute(in: accessLock) {
             status = SecItemCopyMatching(query as CFDictionary, nil)

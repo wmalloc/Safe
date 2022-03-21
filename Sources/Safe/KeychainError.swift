@@ -9,14 +9,14 @@ import Foundation
 import Security
 
 public enum KeychainError: OSStatus, LocalizedError {
-    case success                            = 0
-    case unimplemented                      = -4
-    case param                              = -50
-    case userCanceled                       = -128
-    case notAvailable                       = -25291
-    case missingEntitlement                 = -34018
-    case conversionError                    = -67594
-    case unexpectedError                    = -99999
+    case success = 0
+    case unimplemented = -4
+    case param = -50
+    case userCanceled = -128
+    case notAvailable = -25291
+    case missingEntitlement = -34018
+    case conversionError = -67594
+    case unexpectedError = -99999
 
     public var errorDescription: String? {
         description
@@ -32,6 +32,7 @@ extension KeychainError: RawRepresentable {
         }
     }
 }
+
 extension KeychainError: CustomStringConvertible {
     public var description: String {
         switch self {
@@ -42,7 +43,7 @@ extension KeychainError: CustomStringConvertible {
         case .param:
             return "One or more parameters passed to a function were not valid."
         case .userCanceled:
-             return "User canceled the operation."
+            return "User canceled the operation."
         case .notAvailable:
             return "No keychain is available. You may need to restart your computer."
         case .missingEntitlement:
@@ -62,7 +63,7 @@ extension KeychainError: CustomNSError {
         return Int(rawValue)
     }
 
-    public var errorUserInfo: [String : Any] {
+    public var errorUserInfo: [String: Any] {
         return [NSLocalizedDescriptionKey: description]
     }
 }

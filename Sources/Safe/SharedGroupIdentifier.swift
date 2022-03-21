@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Waqar Malik on 3/20/22.
 //
@@ -16,7 +16,7 @@ public struct SharedGroupIdentifier: Identifiable {
     public var id: String {
         prefix + "." + groupIdentifier
     }
-    
+
     public init?(appIDPrefix: String, nonEmptyGroup groupIdentifier: String?) {
         guard !appIDPrefix.isEmpty, let groupIdentifier = groupIdentifier, !groupIdentifier.isEmpty else {
             return nil
@@ -25,7 +25,7 @@ public struct SharedGroupIdentifier: Identifiable {
         self.prefix = appIDPrefix
         self.groupIdentifier = groupIdentifier
     }
-    
+
     public init?(groupPrefix: String, nonEmptyGroup groupIdentifier: String?) {
         #if os(macOS)
         guard !groupPrefix.isEmpty, let groupIdentifier = groupIdentifier, !groupIdentifier.isEmpty else {
@@ -42,8 +42,8 @@ public struct SharedGroupIdentifier: Identifiable {
     }
 }
 
-extension SharedGroupIdentifier {
-    public var description: String {
+public extension SharedGroupIdentifier {
+    var description: String {
         id
     }
 }
