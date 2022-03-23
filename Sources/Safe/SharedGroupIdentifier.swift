@@ -8,7 +8,7 @@
 import Foundation
 
 // https://developer.apple.com/documentation/security/keychain_services/keychain_items/sharing_access_to_keychain_items_among_a_collection_of_apps
-public struct SharedGroupIdentifier: Identifiable {
+public struct SharedGroupIdentifier: Identifiable, Hashable {
     private static let appGroupPrefix = "group"
     let prefix: String
     let groupIdentifier: String

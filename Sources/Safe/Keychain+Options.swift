@@ -63,7 +63,7 @@ extension Attributes {
 
     var useAuthenticationContext: AnyObject? {
         get {
-            self[UseAuthentication.Context] as? AnyObject
+            self[UseAuthentication.Context] as AnyObject
         }
         set {
             setOrRemove(newValue, forKey: UseAuthentication.Context)
