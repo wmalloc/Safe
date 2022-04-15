@@ -7,6 +7,7 @@
 
 import Foundation
 import Security
+import os.log
 
 public extension Keychain {
     func data(forKey key: String, options: Attributes = .defaultOptions) throws -> Data? {
@@ -68,7 +69,7 @@ public extension Keychain {
 
             var (attributes, error) = configuaration.attributes(forKey: nil, value: value)
             if let error = error {
-                print(error.localizedDescription)
+                os_log(.error, "%@", error.localizedDescription)
                 throw error
             }
 
@@ -97,7 +98,7 @@ public extension Keychain {
         case errSecItemNotFound:
             var (attributes, error) = configuaration.attributes(forKey: key, value: value)
             if let error = error {
-                print(error.localizedDescription)
+                os_log(.error, "%@", error.localizedDescription)
                 throw error
             }
 
